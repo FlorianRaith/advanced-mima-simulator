@@ -1,12 +1,25 @@
-import { color } from '@/components/simulator/utils';
-import { Camera } from '@/components/simulator/Camera';
+import { color } from '@/simulator/utils';
+import { Camera } from '@/simulator/render/Camera';
 
 export interface CanvasWindow {
     width: number;
     height: number;
 }
 
+export interface Renderable {
+    render(context: CanvasRenderingContext2D): void;
+}
+
+export class RenderPipeline {
+    public pipeline: Renderable[] = [];
+
+    public add(renderable: Renderable) {
+        this.pipeline.push(renderable);
+    }
+}
+
 export class Renderer {
+    public readonly pipeline = new RenderPipeline();
     private shouldRender = false;
 
     constructor(private context: CanvasRenderingContext2D, private window: CanvasWindow, private camera: Camera) {}
@@ -34,10 +47,24 @@ export class Renderer {
         ctx.scale(this.camera.scale * this.camera.windowScale, this.camera.scale * this.camera.windowScale);
         ctx.translate(this.camera.offset.x, this.camera.offset.y);
 
-        ctx.beginPath();
-        ctx.rect(-50, -50, 100, 100);
-        ctx.fillStyle = color('secondary-800');
-        ctx.fill();
+        ctx.font =
+            '14px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace';
+
+        // ctx.strokeStyle = 'red';
+        // ctx.beginPath();
+        // ctx.moveTo(-this.window.width / 2, 0);
+        // ctx.lineTo(this.window.width / 2, 0);
+        // ctx.stroke();
+        //
+        // ctx.strokeStyle = 'blue';
+        // ctx.beginPath();
+        // ctx.moveTo(0, -this.window.height / 2);
+        // ctx.lineTo(0, this.window.height / 2);
+        // ctx.stroke();
+
+        for (const object of this.pipeline.pipeline) {
+            object.render(ctx);
+        }
 
         ctx.restore();
         requestAnimationFrame(this.render.bind(this));

@@ -6,11 +6,11 @@
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import Simulator from '@/components/simulator/Simulator.vue';
+import SimulatorComponent from '@/simulator/render/SimulatorComponent.vue';
 
 @Options({
     components: {
-        Simulator,
+        Simulator: SimulatorComponent,
     },
 })
 export default class Home extends Vue {}

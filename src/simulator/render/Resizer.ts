@@ -1,5 +1,5 @@
-import { Camera } from '@/components/simulator/Camera';
-import { CanvasWindow } from '@/components/simulator/Renderer';
+import { Camera } from '@/simulator/render/Camera';
+import { CanvasWindow } from '@/simulator/render/Renderer';
 
 export class Resizer {
     private listener: any = null;

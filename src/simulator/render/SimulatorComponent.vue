@@ -14,10 +14,10 @@
             </canvas>
         </div>
         <div class="max-w-screen-xl w-full mt-3">
-            <p>
-                camera: {{ camera }} <br />
-                window: {{ window }}
-            </p>
+<!--            <p>-->
+<!--                camera: {{ camera }} <br />-->
+<!--                window: {{ window }}-->
+<!--            </p>-->
             <div>
                 <Button
                     @click="
@@ -33,17 +33,18 @@
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import { Renderer, CanvasWindow } from '@/components/simulator/Renderer';
+import { Renderer, CanvasWindow } from '@/simulator/render/Renderer';
 import Button from '@/components/Button.vue';
-import { Camera, CameraCalculator } from '@/components/simulator/Camera';
-import { Resizer } from '@/components/simulator/Resizer';
+import { Camera, CameraCalculator } from '@/simulator/render/Camera';
+import { Resizer } from '@/simulator/render/Resizer';
+import Simulator from '@/simulator/Simulator';
 
 @Options({
     components: {
         Button,
     },
 })
-export default class Simulator extends Vue {
+export default class SimulatorComponent extends Vue {
     private window: CanvasWindow = {
         width: 0,
         height: 0,
@@ -77,6 +78,9 @@ export default class Simulator extends Vue {
 
         this.cameraCalculator = new CameraCalculator(canvas, this.camera);
         this.cameraCalculator.resetView(this.window);
+
+        const simulator = new Simulator(this.renderer.pipeline);
+        simulator.start();
     }
 
     beforeUnmount() {
