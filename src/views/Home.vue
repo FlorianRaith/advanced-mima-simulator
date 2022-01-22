@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <Simulator />
-  </div>
+    <div>
+        <Simulator />
+    </div>
 </template>
 
 <script lang="ts">
@@ -9,9 +9,9 @@ import { Options, Vue } from 'vue-class-component';
 import Simulator from '@/components/simulator/Simulator.vue';
 
 @Options({
-  components: {
-    Simulator,
-  },
+    components: {
+        Simulator,
+    },
 })
 export default class Home extends Vue {}
 </script>

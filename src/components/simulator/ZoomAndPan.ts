@@ -1,8 +1,8 @@
 export default class ZoomAndPan {
-  testNumber: number = 53;
+    testNumber: number = 53;
 
-  changeWidth(width: number): number {
-    width += 10000;
-    return width;
-  }
+    changeWidth(width: number): number {
+        width += 10000;
+        return width;
+    }
 }
