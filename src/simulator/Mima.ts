@@ -46,11 +46,11 @@ export default class MIMA {
 
         this.oneRegister.value = 1;
 
-        this.renderBus();
+        this.registerBus();
         this.renderRegisters();
     }
 
-    private renderBus(): void {
+    private registerBus(): void {
         this.connectBoth(this.akkumulator, this.mainBus, 24, Orientation.HORIZONTAL);
         this.connectBoth(this.instructionAddressRegister, this.mainBus, 20, Orientation.HORIZONTAL);
         this.connect(this.oneRegister, this.mainBus, 24, Orientation.HORIZONTAL);
@@ -89,13 +89,13 @@ export default class MIMA {
         to.connectInput(bus);
 
         if (from instanceof Bus) {
-            bus.renderFromConnectable = to;
-            bus.renderToConnectable = from;
-            bus.renderFromTriangle = true;
+            bus.renderStartConnectable = to;
+            bus.renderEndConnectable = from;
+            bus.renderStartTriangle = true;
         } else {
-            bus.renderFromConnectable = from;
-            bus.renderToConnectable = to;
-            bus.renderToTriangle = true;
+            bus.renderStartConnectable = from;
+            bus.renderEndConnectable = to;
+            bus.renderEndTriangle = true;
         }
         bus.calculateRenderPoints();
 
@@ -107,8 +107,8 @@ export default class MIMA {
     private connectBoth(from: Bus | Register, to: Bus | Register, size: number, direction: Orientation): Bus {
         const bus = this.connect(from, to, size, direction);
 
-        bus.renderFromTriangle = true;
-        bus.renderToTriangle = true;
+        bus.renderStartTriangle = true;
+        bus.renderEndTriangle = true;
 
         bus.connectInput(to);
         bus.connectOutput(from);
