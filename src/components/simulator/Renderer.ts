@@ -28,10 +28,10 @@ export class Renderer {
         const ctx = this.context;
         ctx.clearRect(0, 0, this.window.width, this.window.height);
 
-        this.renderGrid(50, color('primary-100'));
+        this.renderGrid(50 * this.camera.windowScale, color('primary-100'));
 
         ctx.save();
-        ctx.scale(this.camera.scale, this.camera.scale);
+        ctx.scale(this.camera.scale * this.camera.windowScale, this.camera.scale * this.camera.windowScale);
         ctx.translate(this.camera.offset.x, this.camera.offset.y);
 
         ctx.beginPath();
