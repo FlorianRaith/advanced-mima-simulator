@@ -5,72 +5,67 @@
         class="w-full max-w-screen-xl"
         ref="canvas"
         id="canvas"
-        @mousedown="startPanning"
-        @mouseup="stopPanning"
-        @mousemove="onMouseMove"
-        @mouseleave="stopPanning"
-        @wheel="onScroll"
+        @mousedown="cameraCalculator.startPanning"
+        @mouseup="cameraCalculator.stopPanning"
+        @mousemove="cameraCalculator.onMouseMove"
+        @mouseleave="cameraCalculator.stopPanning"
+        @wheel="cameraCalculator.onScroll"
       >
       </canvas>
     </div>
     <div class="max-w-screen-xl w-full mt-3">
       <p></p>
       <div>
-        <Button @click="resetView">reset view</Button>
+        <Button @click="cameraCalculator.resetView(window)">reset view</Button>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import Button from '@/components/Button';
-import renderer from '@/components/simulator/renderer';
-import zoomAndPan from '@/components/simulator/zoomAndPan';
+<script lang="ts">
+import { Options, Vue } from 'vue-class-component';
+import { Renderer, CanvasWindow } from '@/components/simulator/Renderer';
+import Button from '@/components/Button.vue';
+import { Camera, CameraCalculator } from '@/components/simulator/Camera';
 
-export default {
-  name: 'Simulator',
+@Options({
   components: {
     Button,
   },
-  data: () => ({
+})
+export default class Simulator extends Vue {
+  private window: CanvasWindow = {
     width: 0,
     height: 0,
-    context: null,
-    resizeObserver: null,
+  };
 
-    ...renderer.data,
-    ...zoomAndPan.data,
-  }),
+  private camera: Camera = {
+    offset: { x: 0, y: 0 },
+    scale: 1,
+  };
+
+  private context?: CanvasRenderingContext2D = undefined;
+  private renderer?: Renderer = undefined;
+  private cameraCalculator?: CameraCalculator = undefined;
+
   mounted() {
-    const canvas = this.$refs.canvas;
-    this.context = canvas.getContext('2d');
-    this.resizeObserver = new ResizeObserver(this.onResize);
-    this.resizeObserver.observe(canvas);
-    this.onResize();
-    this.shouldRender = true;
-    this.resetView();
-    requestAnimationFrame(this.render);
-  },
+    const canvas = this.$refs.canvas as HTMLCanvasElement;
+    this.context = canvas.getContext('2d')!;
+
+    this.window.width = canvas.clientWidth;
+    this.window.height = canvas.clientHeight;
+    canvas.width = this.window.width;
+    canvas.height = this.window.height;
+
+    this.renderer = new Renderer(this.context, this.window, this.camera);
+    this.renderer.start();
+
+    this.cameraCalculator = new CameraCalculator(canvas, this.camera);
+    this.cameraCalculator.resetView(this.window);
+  }
+
   beforeUnmount() {
-    this.shouldRender = false;
-    this.resizeObserver.unobserve(this.$refs.canvas);
-  },
-  methods: {
-    onResize() {
-      const canvas = this.$refs.canvas;
-
-      this.width = canvas.clientWidth;
-      this.height = canvas.clientHeight;
-      canvas.width = this.width;
-      canvas.height = this.height;
-    },
-
-    floor2(value) {
-      return Math.floor(value * 100) / 100;
-    },
-
-    ...renderer.methods,
-    ...zoomAndPan.methods,
-  },
-};
+    this.renderer!.stop();
+  }
+}
 </script>

@@ -1,16 +1,17 @@
 <template>
-  <div class="">
+  <div>
     <Simulator />
   </div>
 </template>
 
-<script>
-import Simulator from '@/components/simulator/Simulator';
+<script lang="ts">
+import { Options, Vue } from 'vue-class-component';
+import Simulator from '@/components/simulator/Simulator.vue';
 
-export default {
-  name: 'Home',
+@Options({
   components: {
     Simulator,
   },
-};
+})
+export default class Home extends Vue {}
 </script>

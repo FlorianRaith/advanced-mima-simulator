@@ -4,8 +4,8 @@
   </button>
 </template>
 
-<script>
-export default {
-  name: 'Button',
-};
+<script lang="ts">
+import { Vue } from 'vue-class-component';
+
+export default class Button extends Vue {}
 </script>

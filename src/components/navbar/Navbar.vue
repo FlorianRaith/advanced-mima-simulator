@@ -20,13 +20,14 @@
   </div>
 </template>
 
-<script>
-import NavbarLink from '@/components/navbar/NavbarLink';
+<script lang="ts">
+import NavbarLink from '@/components/navbar/NavbarLink.vue';
+import { Options, Vue } from 'vue-class-component';
 
-export default {
-  name: 'Navbar',
+@Options({
   components: {
     NavbarLink,
   },
-};
+})
+export default class Navbar extends Vue {}
 </script>

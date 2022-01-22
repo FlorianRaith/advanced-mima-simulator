@@ -16,11 +16,21 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'NavbarLink',
-  props: {
-    to: String,
-  },
-};
+<script lang="ts">
+import { Vue } from 'vue-class-component';
+import { Prop } from 'vue-property-decorator';
+
+export default class NavbarLink extends Vue {
+  @Prop({ type: String, required: true })
+  private to: string = '';
+}
 </script>
+
+<!--<script>-->
+<!--export default {-->
+<!--  name: 'NavbarLink',-->
+<!--  props: {-->
+<!--    to: String,-->
+<!--  },-->
+<!--};-->
+<!--</script>-->
