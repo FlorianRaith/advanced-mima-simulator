@@ -1,12 +1,15 @@
 import { Renderable } from '@/engine/Renderer';
-import { asBinaryString, color, Locatable, Point } from '@/engine/utils';
-import Bus, { Connectable, Direction } from '@/simulator/Bus';
+import { asBinaryString, color, Direction, Locatable } from '@/engine/utils';
+import { BoundingBox } from '@/engine/lines/Boundary';
+import Vector from '@/engine/Vector';
+import { BusNetwork } from '@/simulator/Bus';
+import { DEBUG } from '@/debug/DebugController';
 
-export default class Register implements Renderable, Locatable, Connectable {
+export default class Register implements Renderable, Locatable, BusNetwork {
     private _value: number = 0;
 
-    public output?: Bus = undefined;
-    public input?: Bus = undefined;
+    public output?: BusNetwork = undefined;
+    public input?: BusNetwork = undefined;
 
     constructor(public x: number, public y: number, private name: string, private size: number) {}
 
@@ -18,40 +21,19 @@ export default class Register implements Renderable, Locatable, Connectable {
         this._value = Math.min(value, Math.pow(2, this.size) - 1);
     }
 
-    public connectOutput(bus: Connectable): void {
-        if (!(bus instanceof Bus)) {
-            throw new Error('Cannot connect to non-bus');
-        }
-
-        this.output = bus;
+    public addOutput(obj: BusNetwork): void {
+        this.output = obj;
     }
 
-    public connectInput(bus: Connectable): void {
-        if (!(bus instanceof Bus)) {
-            throw new Error('Cannot connect to non-bus');
-        }
-
-        this.input = bus;
+    public addInput(obj: BusNetwork): void {
+        this.input = obj;
     }
 
-    public getConnectPoint(direction: Direction): Point {
-        if (direction === Direction.RIGHT) {
-            return { x: this.x + (this.size * 25) / 2 + 0.5, y: this.y };
-        }
-
-        if (direction === Direction.LEFT) {
-            return { x: this.x - (this.size * 25) / 2 - 0.5, y: this.y };
-        }
-
-        if (direction === Direction.UP) {
-            return { x: this.x, y: this.y - 25.5 };
-        }
-
-        if (direction === Direction.DOWN) {
-            return { x: this.x, y: this.y + 25.5 };
-        }
-
-        return { x: this.x, y: this.y };
+    getBoundary(): BoundingBox {
+        return new BoundingBox(
+            new Vector(this.x + (-this.size * 25) / 2, this.y - 25),
+            new Vector(this.x + this.size * 25 + (-this.size * 25) / 2, this.y + 25)
+        );
     }
 
     public render(context: CanvasRenderingContext2D): void {
@@ -72,6 +54,7 @@ export default class Register implements Renderable, Locatable, Connectable {
         context.lineTo(this.x + this.size * 25, this.y + 25);
 
         context.strokeStyle = color('secondary-600');
+        context.lineWidth = 1;
         context.stroke();
 
         const nameOffset = this.size > 1 ? 15 : 9;
@@ -90,5 +73,18 @@ export default class Register implements Renderable, Locatable, Connectable {
         }
 
         context.restore();
+
+        if (DEBUG) {
+            const allDirections = [Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT];
+            for (const direction of allDirections) {
+                const point = this.getBoundary().getConnectPoint(direction);
+
+                context.beginPath();
+                context.rect(point.x - 0.5, point.y - 0.5, 1, 1);
+                context.lineWidth = 1;
+                context.fillStyle = 'yellow';
+                context.fill();
+            }
+        }
     }
 }

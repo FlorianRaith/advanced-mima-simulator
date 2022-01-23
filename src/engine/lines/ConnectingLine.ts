@@ -17,7 +17,7 @@ export enum LineType {
 
 export default class ConnectingLine implements Renderable, Connectable {
     public static readonly WIDTH = 5;
-    private line?: Line;
+    private line: Line;
     private boundingLine: BoundingLine = new BoundingLine(Vector.origin(), Vector.origin());
 
     constructor(
@@ -25,15 +25,20 @@ export default class ConnectingLine implements Renderable, Connectable {
         public to: Connectable,
         public type: LineType = LineType.UNIDIRECTIONAL,
         public branch: LineBranch = LineBranch.Y_FIRST
-    ) {}
+    ) {
+        this.line = this.calculateLine();
+    }
 
     render(context: CanvasRenderingContext2D): void {
-        if (!this.line) {
-            this.calculateLine();
-            return;
-        }
-
         this.line.render(context);
+    }
+
+    get center(): Vector {
+        return this.line!.from.add(this.line!.to).multiply(0.5);
+    }
+
+    get isHorizontal(): boolean {
+        return this.line!.isHorizontal;
     }
 
     getBoundary(): Boundary {
@@ -41,7 +46,7 @@ export default class ConnectingLine implements Renderable, Connectable {
     }
 
     // this is a bit hacky, but it works
-    public calculateLine() {
+    public calculateLine(): Line {
         let from!: Vector;
         let to!: Vector;
 
@@ -67,16 +72,24 @@ export default class ConnectingLine implements Renderable, Connectable {
         this.boundingLine = new BoundingLine(from, to);
 
         // only support connecting a line to another non line object
-        if (this.from instanceof ConnectingLine && to !== undefined && !(this.to instanceof ConnectingLine)) {
+        if (
+            this.from.getBoundary() instanceof BoundingLine &&
+            to !== undefined &&
+            !(this.to.getBoundary() instanceof BoundingLine)
+        ) {
             from = (this.from.getBoundary() as BoundingLine).getConnectPoint(to);
         }
 
-        if (this.to instanceof ConnectingLine && from !== undefined && !(this.from instanceof ConnectingLine)) {
+        if (
+            this.to.getBoundary() instanceof BoundingLine &&
+            from !== undefined &&
+            !(this.from.getBoundary() instanceof BoundingLine)
+        ) {
             to = (this.to.getBoundary() as BoundingLine).getConnectPoint(from);
         }
 
         if (from == undefined || to == undefined) {
-            return;
+            throw new Error('Cannot connect objects');
         }
 
         const temp = new Line(from, to);
@@ -92,17 +105,18 @@ export default class ConnectingLine implements Renderable, Connectable {
             to = (this.to.getBoundary() as BoundingBox).getConnectPoint(oppositeDirection(temp.toTriangleDirection));
         }
 
-        this.line = new Line(from, to);
-        this.line.width = ConnectingLine.WIDTH;
+        const line = new Line(from, to);
+        line.width = ConnectingLine.WIDTH;
 
         if (this.type === LineType.UNIDIRECTIONAL || this.type == LineType.BIDIRECTIONAL) {
-            this.line.renderToTriangle = true;
+            line.renderToTriangle = true;
         }
 
         if (this.type === LineType.BIDIRECTIONAL) {
-            this.line.renderFromTriangle = true;
+            line.renderFromTriangle = true;
         }
 
-        this.line.branch = this.branch;
+        line.branch = this.branch;
+        return line;
     }
 }

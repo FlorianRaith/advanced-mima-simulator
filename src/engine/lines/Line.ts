@@ -49,6 +49,10 @@ export default class Line implements Renderable {
         return this.from.x === this.to.x || this.from.y === this.to.y;
     }
 
+    get isHorizontal(): boolean {
+        return Math.abs(this.from.x - this.to.x) > Math.abs(this.from.y - this.to.y);
+    }
+
     public render(context: CanvasRenderingContext2D): void {
         context.save();
 
