@@ -14,7 +14,7 @@ import Simulator from '@/simulator/Simulator';
         Canvas,
     },
 })
-export default class DebugCanvas extends Vue {
+export default class SimulatorCanvas extends Vue {
     private controller: Simulator = new Simulator();
 }
 </script>
