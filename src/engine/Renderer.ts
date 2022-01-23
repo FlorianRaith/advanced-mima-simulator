@@ -1,5 +1,6 @@
 import { color } from '@/engine/utils';
 import { Camera } from '@/engine/Camera';
+import { DEBUG } from '@/debug/DebugController';
 
 export interface CanvasWindow {
     width: number;
@@ -15,6 +16,10 @@ export class RenderPipeline {
 
     public add(renderable: Renderable) {
         this.pipeline.push(renderable);
+    }
+
+    public addAll(...renderables: Renderable[]) {
+        this.pipeline.push(...renderables);
     }
 }
 
@@ -50,17 +55,19 @@ export class Renderer {
         ctx.font =
             '14px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace';
 
-        // ctx.strokeStyle = 'red';
-        // ctx.beginPath();
-        // ctx.moveTo(-this.window.width / 2, 0);
-        // ctx.lineTo(this.window.width / 2, 0);
-        // ctx.stroke();
-        //
-        // ctx.strokeStyle = 'blue';
-        // ctx.beginPath();
-        // ctx.moveTo(0, -this.window.height / 2);
-        // ctx.lineTo(0, this.window.height / 2);
-        // ctx.stroke();
+        if (DEBUG) {
+            ctx.strokeStyle = '#FF8391';
+            ctx.beginPath();
+            ctx.moveTo(-25, 0);
+            ctx.lineTo(25, 0);
+            ctx.stroke();
+
+            ctx.strokeStyle = '#A2ABFF';
+            ctx.beginPath();
+            ctx.moveTo(0, -25);
+            ctx.lineTo(0, 25);
+            ctx.stroke();
+        }
 
         for (const object of this.pipeline.pipeline) {
             object.render(ctx);
