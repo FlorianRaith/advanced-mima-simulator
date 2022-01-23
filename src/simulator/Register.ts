@@ -1,4 +1,4 @@
-import { Renderable } from '@/simulator/render/Renderer';
+import { Renderable } from '@/engine/Renderer';
 import { asBinaryString, color, Locatable, Point } from '@/simulator/utils';
 import Bus, { Connectable, Direction } from '@/simulator/Bus';
 

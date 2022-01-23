@@ -1,5 +1,5 @@
 import { Point } from '@/simulator/utils';
-import { CanvasWindow } from '@/simulator/render/Renderer';
+import { CanvasWindow } from '@/engine/Renderer';
 
 export interface Camera {
     offset: Point;

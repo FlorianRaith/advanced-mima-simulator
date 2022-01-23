@@ -1,4 +1,4 @@
-import { Renderable } from '@/simulator/render/Renderer';
+import { Renderable } from '@/engine/Renderer';
 import { color, Locatable, Point } from '@/simulator/utils';
 
 export interface Connectable extends Locatable {

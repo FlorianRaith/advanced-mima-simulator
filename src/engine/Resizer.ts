@@ -1,5 +1,5 @@
-import { Camera } from '@/simulator/render/Camera';
-import { CanvasWindow } from '@/simulator/render/Renderer';
+import { Camera } from '@/engine/Camera';
+import { CanvasWindow } from '@/engine/Renderer';
 
 export class Resizer {
     private listener: any = null;
@@ -19,7 +19,7 @@ export class Resizer {
         window.removeEventListener('resize', this.listener);
     }
 
-    private onResize() {
+    public onResize() {
         this.scale();
         const newWidth = this.canvas.clientWidth;
         const newHeight = this.canvas.clientHeight;

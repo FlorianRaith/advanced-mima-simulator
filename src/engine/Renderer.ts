@@ -1,5 +1,5 @@
 import { color } from '@/simulator/utils';
-import { Camera } from '@/simulator/render/Camera';
+import { Camera } from '@/engine/Camera';
 
 export interface CanvasWindow {
     width: number;

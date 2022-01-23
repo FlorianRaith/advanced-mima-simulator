@@ -14,18 +14,8 @@
             </canvas>
         </div>
         <div class="max-w-screen-xl w-full mt-3">
-<!--            <p>-->
-<!--                camera: {{ camera }} <br />-->
-<!--                window: {{ window }}-->
-<!--            </p>-->
             <div>
-                <Button
-                    @click="
-                        resizer.scale();
-                        cameraCalculator.resetView(window);
-                    "
-                    >reset view</Button
-                >
+                <Button @click="resetView">reset view</Button>
             </div>
         </div>
     </div>
@@ -33,18 +23,19 @@
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import { Renderer, CanvasWindow } from '@/simulator/render/Renderer';
+import { CanvasWindow, Renderer } from '@/engine/Renderer';
 import Button from '@/components/Button.vue';
-import { Camera, CameraCalculator } from '@/simulator/render/Camera';
-import { Resizer } from '@/simulator/render/Resizer';
-import Simulator from '@/simulator/Simulator';
+import { Camera, CameraCalculator } from '@/engine/Camera';
+import { Resizer } from '@/engine/Resizer';
+import { Prop } from 'vue-property-decorator';
+import Controller from '@/engine/Controller';
 
 @Options({
     components: {
         Button,
     },
 })
-export default class SimulatorComponent extends Vue {
+export default class Canvas extends Vue {
     private window: CanvasWindow = {
         width: 0,
         height: 0,
@@ -55,6 +46,9 @@ export default class SimulatorComponent extends Vue {
         scale: 1,
         windowScale: 1,
     };
+
+    @Prop({ type: Controller, required: true })
+    private controller!: Controller;
 
     private renderer?: Renderer = undefined;
     private cameraCalculator?: CameraCalculator = undefined;
@@ -79,13 +73,18 @@ export default class SimulatorComponent extends Vue {
         this.cameraCalculator = new CameraCalculator(canvas, this.camera);
         this.cameraCalculator.resetView(this.window);
 
-        const simulator = new Simulator(this.renderer.pipeline);
-        simulator.start();
+        this.controller.create(this.renderer.pipeline);
     }
 
     beforeUnmount() {
         this.renderer!.stop();
         this.resizer!.stopListening();
+        this.controller.destroy();
+    }
+
+    resetView() {
+        this.resizer!.scale();
+        this.cameraCalculator!.resetView(this.window);
     }
 }
 </script>

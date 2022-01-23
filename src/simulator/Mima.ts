@@ -1,4 +1,4 @@
-import { RenderPipeline } from '@/simulator/render/Renderer';
+import { RenderPipeline } from '@/engine/Renderer';
 import Register from '@/simulator/Register';
 import Bus, { Connectable, Orientation } from '@/simulator/Bus';
 import MainBus from '@/simulator/MainBus';
