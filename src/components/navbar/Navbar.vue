@@ -12,6 +12,7 @@
                                 <NavbarLink to="/">Home</NavbarLink>
                                 <NavbarLink to="/learn">Learn</NavbarLink>
                                 <NavbarLink to="/about">About</NavbarLink>
+                                <NavbarLink to="/debug">Debug</NavbarLink>
                             </div>
                         </div>
                     </div>
