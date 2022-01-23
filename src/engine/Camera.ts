@@ -1,4 +1,4 @@
-import { Point } from '@/simulator/utils';
+import { Point } from '@/engine/utils';
 import { CanvasWindow } from '@/engine/Renderer';
 
 export interface Camera {

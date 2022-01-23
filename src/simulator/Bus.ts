@@ -1,5 +1,5 @@
 import { Renderable } from '@/engine/Renderer';
-import { color, Locatable, Point } from '@/simulator/utils';
+import { color, Locatable, Point } from '@/engine/utils';
 
 export interface Connectable extends Locatable {
     connectOutput(bus: Connectable): void;

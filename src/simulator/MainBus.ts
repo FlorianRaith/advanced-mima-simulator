@@ -1,5 +1,5 @@
 import Bus, { Orientation } from '@/simulator/Bus';
-import { Point } from '@/simulator/utils';
+import { Point } from '@/engine/utils';
 
 export default class MainBus extends Bus {
     constructor(size: number, private from: Point, private to: Point) {

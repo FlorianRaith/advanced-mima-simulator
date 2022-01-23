@@ -1,5 +1,5 @@
 import { Renderable } from '@/engine/Renderer';
-import { color } from '@/simulator/utils';
+import { color } from '@/engine/utils';
 
 export default class Rectangle implements Renderable {
     constructor(public x: number, public y: number, public width: number, public height: number) {}

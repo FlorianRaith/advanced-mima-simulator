@@ -1,5 +1,5 @@
 import { Renderable } from '@/engine/Renderer';
-import { asBinaryString, color, Locatable, Point } from '@/simulator/utils';
+import { asBinaryString, color, Locatable, Point } from '@/engine/utils';
 import Bus, { Connectable, Direction } from '@/simulator/Bus';
 
 export default class Register implements Renderable, Locatable, Connectable {

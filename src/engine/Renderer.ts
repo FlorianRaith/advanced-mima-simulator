@@ -1,4 +1,4 @@
-import { color } from '@/simulator/utils';
+import { color } from '@/engine/utils';
 import { Camera } from '@/engine/Camera';
 
 export interface CanvasWindow {
