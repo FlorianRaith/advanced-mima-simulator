@@ -29,6 +29,7 @@ import { Camera, CameraCalculator } from '@/engine/Camera';
 import { Resizer } from '@/engine/Resizer';
 import { Prop } from 'vue-property-decorator';
 import Controller from '@/engine/Controller';
+import { floor5 } from '@/engine/utils';
 
 @Options({
     components: {
@@ -54,6 +55,22 @@ export default class Canvas extends Vue {
     private cameraCalculator?: CameraCalculator = undefined;
     private resizer?: Resizer = undefined;
 
+    private historyUpdateInterval: number = 0;
+
+    updateHistoryState() {
+        history.pushState(
+            {},
+            '',
+            this.$route.path +
+                '#' +
+                floor5(this.camera.offset.x) +
+                ',' +
+                floor5(this.camera.offset.y) +
+                ',' +
+                floor5(this.camera.scale)
+        );
+    }
+
     mounted() {
         const canvas = this.$refs.canvas as HTMLCanvasElement;
         const context = canvas.getContext('2d')!;
@@ -74,9 +91,25 @@ export default class Canvas extends Vue {
         this.cameraCalculator.resetView(this.window);
 
         this.controller.create(this.renderer.pipeline);
+
+        this.extractCameraValues();
+        this.historyUpdateInterval = setInterval(this.updateHistoryState.bind(this), 1000);
+    }
+
+    private extractCameraValues() {
+        const hrefSplit = window.location.href.split('#');
+        if (hrefSplit.length > 1) {
+            const coords = hrefSplit[1].split(',');
+            if (coords.length === 3) {
+                this.camera.offset.x = parseFloat(coords[0]);
+                this.camera.offset.y = parseFloat(coords[1]);
+                this.camera.scale = parseFloat(coords[2]);
+            }
+        }
     }
 
     beforeUnmount() {
+        clearInterval(this.historyUpdateInterval);
         this.renderer!.stop();
         this.resizer!.stopListening();
         this.controller.destroy();
