@@ -26,22 +26,6 @@ export function floor5(value: number): number {
     return Math.floor(value * 10000) / 10000;
 }
 
-// export function vectorLength(vector: Point): number {
-//     return Math.sqrt(vector.x * vector.x + vector.y * vector.y);
-// }
-//
-// export function origin(): Point {
-//     return { x: 0, y: 0 };
-// }
-//
-// export function isSamePoint(a: Point, b: Point): boolean {
-//     return a.x === b.x && a.y === b.y;
-// }
-//
-// export function copyPoint(point: Point): Point {
-//     return { x: point.x, y: point.y };
-// }
-//
 export function oppositeDirection(direction: Direction): Direction {
     if (direction === Direction.UP) {
         return Direction.DOWN;

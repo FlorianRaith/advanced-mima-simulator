@@ -68,16 +68,6 @@ export default class MIMA {
             new Bus(20, this.mainBus, this.memoryAddressRegister),
             new Bus(24, this.mainBus, this.memoryDataRegister, LineType.BIDIRECTIONAL)
         );
-        // this.connectBoth(this.akkumulator, this.mainBus, 24, Orientation.HORIZONTAL);
-        // this.connectBoth(this.instructionAddressRegister, this.mainBus, 20, Orientation.HORIZONTAL);
-        // this.connect(this.oneRegister, this.mainBus, 24, Orientation.HORIZONTAL);
-        // this.connectBoth(this.instructionRegister, this.mainBus, 24, Orientation.HORIZONTAL);
-        // this.connect(this.z, this.mainBus, 24, Orientation.HORIZONTAL);
-        // this.connect(this.mainBus, this.x, 24, Orientation.HORIZONTAL);
-        // this.connect(this.mainBus, this.y, 24, Orientation.HORIZONTAL);
-        // this.connect(this.mainBus, this.memoryAddressRegister, 20, Orientation.HORIZONTAL);
-        // this.connectBoth(this.mainBus, this.memoryDataRegister, 24, Orientation.HORIZONTAL);
-        // this.connectBoth(this.memoryAddressRegister, this.oneRegister, 24, Orientation.VERTICAL);
     }
 
     private renderRegisters(): void {
@@ -95,44 +85,4 @@ export default class MIMA {
 
         this.renderPipeline.add(this.mainBus);
     }
-
-    // private connect(from: Connectable, to: Connectable, size: number, direction: Orientation): Bus {
-    //     const bus = new Bus(size, direction);
-    //
-    //     bus.connectInput(from);
-    //     bus.connectOutput(to);
-    //
-    //     from.connectOutput(bus);
-    //     to.connectInput(bus);
-    //
-    //     if (from instanceof Bus) {
-    //         bus.renderStartConnectable = to;
-    //         bus.renderEndConnectable = from;
-    //         bus.renderStartTriangle = true;
-    //     } else {
-    //         bus.renderStartConnectable = from;
-    //         bus.renderEndConnectable = to;
-    //         bus.renderEndTriangle = true;
-    //     }
-    //     bus.calculateRenderPoints();
-    //
-    //     this.renderPipeline.add(bus);
-    //
-    //     return bus;
-    // }
-    //
-    // private connectBoth(from: Bus | Register, to: Bus | Register, size: number, direction: Orientation): Bus {
-    //     const bus = this.connect(from, to, size, direction);
-    //
-    //     bus.renderStartTriangle = true;
-    //     bus.renderEndTriangle = true;
-    //
-    //     bus.connectInput(to);
-    //     bus.connectOutput(from);
-    //
-    //     from.connectInput(bus);
-    //     to.connectOutput(bus);
-    //
-    //     return bus;
-    // }
 }
