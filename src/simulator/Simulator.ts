@@ -3,10 +3,13 @@ import Mima from '@/simulator/Mima';
 import Controller from '@/engine/Controller';
 
 export default class Simulator extends Controller {
+    private mima?: Mima;
+
     create(renderPipeline: RenderPipeline): void {
-        const mima = new Mima(renderPipeline);
-        mima.start();
+        this.mima = new Mima(renderPipeline);
     }
 
-    destroy(): void {}
+    destroy(): void {
+        this.mima?.shutdown();
+    }
 }
