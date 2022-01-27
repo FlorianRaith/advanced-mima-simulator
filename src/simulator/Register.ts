@@ -1,9 +1,10 @@
 import { Renderable } from '@/engine/Renderer';
-import { asBinaryString, color, Direction, Locatable } from '@/engine/utils';
+import { asHexString, color, Direction, Locatable } from '@/engine/utils';
 import { BoundingBox } from '@/engine/lines/Boundary';
 import Vector from '@/engine/Vector';
 import { BusNetwork } from '@/simulator/Bus';
 import { DEBUG } from '@/debug/DebugController';
+import Mima from '@/simulator/Mima';
 
 export default class Register implements Renderable, Locatable, BusNetwork {
     private _value: number = 0;
@@ -11,14 +12,36 @@ export default class Register implements Renderable, Locatable, BusNetwork {
     public output?: BusNetwork = undefined;
     public input?: BusNetwork = undefined;
 
+    public reading: boolean = false;
+    public writing: boolean = false;
+
     constructor(public x: number, public y: number, private name: string, private size: number) {}
+
+    public tick(mima: Mima) {
+        if (this.isActive()) {
+            this.reading = false;
+            this.writing = false;
+        }
+    }
+
+    public read() {
+        this.reading = true;
+    }
+
+    public write() {
+        this.writing = true;
+    }
+
+    isActive(): boolean {
+        return this.reading || this.writing;
+    }
 
     public get value(): number {
         return this._value;
     }
 
     public set value(value: number) {
-        this._value = Math.min(value, Math.pow(2, this.size) - 1);
+        this._value = Math.min(value, Math.pow(2, this.size * 4) - 1);
     }
 
     public addOutput(obj: BusNetwork): void {
@@ -61,15 +84,9 @@ export default class Register implements Renderable, Locatable, BusNetwork {
         context.fillStyle = color('secondary-600');
         context.fillText(this.name, this.x + nameOffset, this.y + 17);
 
-        const binValue = asBinaryString(this._value);
+        const hexValue = asHexString(this._value);
         for (let i = 0; i < this.size; i++) {
-            context.fillText(binValue[i - this.size + binValue.length] ?? '0', this.x + 25 * i + 9, this.y + 42);
-        }
-
-        if (this.size > 2) {
-            const decValue = '(' + this._value + ')';
-            const measure = context.measureText(decValue);
-            context.fillText('(' + this._value + ')', this.x + this.size * 25 - measure.width - 10, this.y + 17);
+            context.fillText(hexValue[i - this.size + hexValue.length] ?? '0', this.x + 25 * i + 9, this.y + 42);
         }
 
         context.restore();

@@ -1,6 +1,6 @@
 import { RenderPipeline } from '@/engine/Renderer';
 import Register from '@/simulator/Register';
-import Bus from '@/simulator/Bus';
+import Bus, { BusNetwork } from '@/simulator/Bus';
 import { ConnectPoint } from '@/engine/lines/ConnectPoint';
 import { LineType } from '@/engine/lines/ConnectingLine';
 
@@ -19,10 +19,16 @@ export default class Mima {
     private readonly y: Register;
     private readonly memoryAddressRegister: Register;
     private readonly memoryDataRegister: Register;
-    private readonly read: Register;
-    private readonly write: Register;
+    private readonly readRegister: Register;
+    private readonly writeRegister: Register;
+
+    private readonly allRegisters: Register[] = [];
+    private readonly busNetwork: Bus[] = [];
 
     private readonly mainBus: Bus;
+
+    private actions: (() => void)[] = [];
+    private ticker: number = -1;
 
     constructor(private readonly renderPipeline: RenderPipeline) {
         // register registers
@@ -35,8 +41,8 @@ export default class Mima {
         this.y = this.createRegisterRelatively('Y', 6, 1.3, 5.1);
         this.memoryAddressRegister = this.createRegisterRelatively('SAR', 5, 0, 6);
         this.memoryDataRegister = this.createRegisterRelatively('SDR', 6, 0.75, 6);
-        this.read = this.createRegisterRelatively('R', 1, 1.23, 6);
-        this.write = this.createRegisterRelatively('W', 1, 1.37, 6);
+        this.readRegister = this.createRegisterRelatively('R', 1, 1.23, 6);
+        this.writeRegister = this.createRegisterRelatively('W', 1, 1.37, 6);
 
         // register main bus
         this.renderPipeline.add(
@@ -44,31 +50,98 @@ export default class Mima {
                 24,
                 new ConnectPoint(Mima.px + Mima.gapX * 0.4, Mima.py - 30),
                 new ConnectPoint(Mima.px + Mima.gapX * 0.4, Mima.py + Mima.gapY * 6.5),
-                LineType.BIDIRECTIONAL
+                LineType.BIDIRECTIONAL,
+                true
             ))
         );
 
         // register bus network
-        this.renderPipeline.addAll(
-            new Bus(24, this.akkumulator, this.mainBus, LineType.BIDIRECTIONAL),
-            new Bus(20, this.instructionAddressRegister, this.mainBus, LineType.BIDIRECTIONAL),
-            new Bus(24, this.oneRegister, this.mainBus),
-            new Bus(24, this.instructionRegister, this.mainBus, LineType.BIDIRECTIONAL),
-            new Bus(24, this.z, this.mainBus),
-            new Bus(24, this.mainBus, this.x),
-            new Bus(24, this.mainBus, this.y),
-            new Bus(20, this.mainBus, this.memoryAddressRegister),
-            new Bus(24, this.mainBus, this.memoryDataRegister, LineType.BIDIRECTIONAL)
-        );
+        this.registerBus(24, this.akkumulator, this.mainBus, LineType.BIDIRECTIONAL);
+        this.registerBus(20, this.instructionAddressRegister, this.mainBus, LineType.BIDIRECTIONAL);
+        this.registerBus(24, this.oneRegister, this.mainBus);
+        this.registerBus(24, this.instructionRegister, this.mainBus, LineType.BIDIRECTIONAL);
+        this.registerBus(24, this.z, this.mainBus);
+        this.registerBus(24, this.mainBus, this.x);
+        this.registerBus(24, this.mainBus, this.y);
+        this.registerBus(20, this.mainBus, this.memoryAddressRegister);
+        this.registerBus(24, this.mainBus, this.memoryDataRegister, LineType.BIDIRECTIONAL);
+        this.registerBus(20, this.memoryAddressRegister, new ConnectPoint(Mima.px, Mima.py + Mima.gapY * 7));
 
         this.oneRegister.value = 1;
+        this.memoryDataRegister.value = 23452;
+
+        setInterval(this.tick.bind(this), 1000);
+        this.read();
+        this.write();
+
+        this.actions.push(() => {
+            this.akkumulator.read();
+            this.memoryDataRegister.write();
+            this.instructionRegister.read();
+        });
     }
 
-    public shutdown(): void {}
+    public shutdown(): void {
+        clearInterval(this.ticker);
+    }
+
+    public tick() {
+        const action = this.actions.pop();
+        if (action) {
+            action();
+        }
+
+        if (this.readRegister.value !== 0) {
+            this.readRegister.value = (this.readRegister.value + 1) % 4;
+        }
+
+        if (this.writeRegister.value !== 0) {
+            this.writeRegister.value = (this.writeRegister.value + 1) % 4;
+        }
+
+        for (const bus of this.busNetwork) {
+            bus.tick(this);
+        }
+
+        this.mainBus.tick(this);
+
+        for (const register of this.allRegisters) {
+            register.tick(this);
+        }
+    }
+
+    public read() {
+        this.readRegister.value = 1;
+    }
+
+    get isReading(): boolean {
+        return this.readRegister.value !== 0;
+    }
+
+    public write() {
+        this.writeRegister.value = 1;
+    }
+
+    get isWriting(): boolean {
+        return this.writeRegister.value !== 0;
+    }
 
     private createRegisterRelatively(name: string, size: number, xOffset: number, yOffset: number): Register {
         const register = new Register(Mima.px + Mima.gapX * xOffset, Mima.py + Mima.gapY * yOffset, name, size);
         this.renderPipeline.addAll(register);
+        this.allRegisters.push(register);
         return register;
+    }
+
+    private registerBus(
+        size: number,
+        from: BusNetwork | ConnectPoint,
+        to: BusNetwork | ConnectPoint,
+        type: LineType = LineType.UNIDIRECTIONAL
+    ): Bus {
+        const bus = new Bus(size, from, to, type);
+        this.busNetwork.push(bus);
+        this.renderPipeline.add(bus);
+        return bus;
     }
 }

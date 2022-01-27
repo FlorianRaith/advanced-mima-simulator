@@ -17,7 +17,7 @@ export enum LineType {
 
 export default class ConnectingLine implements Renderable, Connectable {
     public static readonly WIDTH = 5;
-    private line: Line;
+    public line: Line;
     private boundingLine: BoundingLine = new BoundingLine(Vector.origin(), Vector.origin());
 
     constructor(
@@ -39,6 +39,10 @@ export default class ConnectingLine implements Renderable, Connectable {
 
     get isHorizontal(): boolean {
         return this.line!.isHorizontal;
+    }
+
+    set color(color: string) {
+        this.line.color = color;
     }
 
     getBoundary(): Boundary {

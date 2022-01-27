@@ -3,18 +3,23 @@ import ConnectingLine, { Connectable, LineType } from '@/engine/lines/Connecting
 import { Boundary } from '@/engine/lines/Boundary';
 import { color } from '@/engine/utils';
 import { ConnectPoint } from '@/engine/lines/ConnectPoint';
+import Mima from '@/simulator/Mima';
 
 export interface BusNetwork extends Connectable {
     addOutput(obj: BusNetwork): void;
     addInput(obj: BusNetwork): void;
+    isActive(): boolean;
 }
 
 export default class Bus implements Renderable, BusNetwork {
+    public active: boolean = false;
+
     constructor(
         public readonly size: number,
         public readonly from: BusNetwork | ConnectPoint,
         public readonly to: BusNetwork | ConnectPoint,
-        public readonly type: LineType = LineType.UNIDIRECTIONAL
+        public readonly type: LineType = LineType.UNIDIRECTIONAL,
+        private readonly isMain: boolean = false
     ) {
         this.line = new ConnectingLine(from, to, type);
 
@@ -52,7 +57,25 @@ export default class Bus implements Renderable, BusNetwork {
         this.inputs.push(obj);
     }
 
+    isActive(): boolean {
+        return this.active;
+    }
+
+    public tick(mima: Mima) {
+        if (this.isMain) {
+            this.active = [...this.inputs, ...this.outputs].some((obj) => obj.isActive());
+        } else {
+            this.active = [...this.inputs, ...this.outputs]
+                .filter((obj) => !(obj instanceof Bus))
+                .some((obj) => obj.isActive());
+        }
+    }
+
     render(context: CanvasRenderingContext2D): void {
+        if (this.active) {
+            this.line.color = 'red-500';
+        }
+
         this.line.render(context);
 
         const center = this.line.center;

@@ -18,8 +18,8 @@ export function color(value: string): string {
     return getComputedStyle(canvas).getPropertyValue('--' + value);
 }
 
-export function asBinaryString(value: number): string {
-    return (value >>> 0).toString(2);
+export function asHexString(value: number): string {
+    return (value >>> 0).toString(16);
 }
 
 export function floor5(value: number): number {

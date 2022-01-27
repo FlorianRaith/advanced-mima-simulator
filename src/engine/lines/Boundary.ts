@@ -1,5 +1,5 @@
 import Vector from '@/engine/Vector';
-import { Direction, Point } from '@/engine/utils';
+import { Direction } from '@/engine/utils';
 import ConnectingLine from '@/engine/lines/ConnectingLine';
 
 export interface Boundary {}
